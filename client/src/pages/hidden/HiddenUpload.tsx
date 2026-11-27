@@ -1,5 +1,6 @@
 import type { ChangeEvent, FC } from 'react';
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import Header from '../main/Header/Header';
 import { postHiddenUpload } from '../../api/httpClient';
 import type { HiddenUploadResponse } from '../../interfaces/HiddenUploadResponse';
@@ -129,7 +130,7 @@ const HiddenUpload: FC = () => {
             {fileName && (
               <div
                 style={{ marginTop: 8 }}
-                dangerouslySetInnerHTML={{ __html: fileName }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(fileName) }}
               />
             )}
             <label
@@ -169,11 +170,11 @@ const HiddenUpload: FC = () => {
                     {preview.isSvg ? (
                       <div
                         style={{ maxWidth: '100%' }}
-                        dangerouslySetInnerHTML={{ __html: preview.content }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(preview.content) }}
                       />
                     ) : (
                       <img
-                        src={preview.content}
+                        src={DOMPurify.sanitize(preview.content)}
                         alt="Preview"
                         style={{ maxWidth: '100%', borderRadius: 4 }}
                       />
@@ -210,7 +211,7 @@ const HiddenUpload: FC = () => {
                   }}
                 >
                   <img
-                    src={result.content}
+                    src={DOMPurify.sanitize(result.content)}
                     alt="Uploaded hidden"
                     style={{ maxWidth: '100%' }}
                   />

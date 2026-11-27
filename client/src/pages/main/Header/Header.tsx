@@ -12,8 +12,8 @@ interface Props {
 
 export const Header: FC<Props> = (props: Props) => {
   useEffect(() => {
-    postMetadata().then((data) => console.log('xml', data));
-    getSpawnData().then((data) => console.log('spawn', data));
+    postMetadata().then((data) => console.log('xml', JSON.stringify(data)));
+    getSpawnData().then((data) => console.log('spawn', JSON.stringify(data)));
     getSpawnDataGrpc().then((data) => console.log('spawn grpc', data));
   }, []);
 

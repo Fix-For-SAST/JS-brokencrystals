@@ -63,6 +63,23 @@ export class AppController {
 
   constructor(private readonly appService: AppService) {}
 
+  private validRedirect(redirectUrl: string): string {
+    // Hardcoded list of every permitted redirect destination.
+    const validRedirectUrls = [
+      'https://google.com',
+      'https://www.google.com'
+    ];
+
+    // Strict equality lookup — indexOf returns -1 for anything not in the list
+    const index = validRedirectUrls.indexOf(redirectUrl);
+
+    // Reject anything not on the list — never fall back to the raw input
+    if (index === -1) throw new Error('Invalid redirect URL');
+
+    // Return the value from the hardcoded array, NOT the caller-supplied string
+    return validRedirectUrls[index];
+  }
+
   @Post('render')
   @ApiProduces('text/plain')
   @ApiConsumes('text/plain')
@@ -92,7 +109,7 @@ export class AppController {
   })
   @Redirect()
   async redirect(@Query('url') url: string) {
-    return { url };
+    return { url: this.validRedirect(url) };
   }
 
   @Post('metadata')
@@ -153,7 +170,7 @@ export class AppController {
     }
   })
   async getCommandResult(@Query('command') command: string): Promise<string> {
-    this.logger.debug(`launch ${command} command`);
+    this.logger.debug(`launch ${JSON.stringify(command)} command`);
     try {
       return await this.appService.launchCommand(command);
     } catch (err) {
@@ -224,7 +241,7 @@ export class AppController {
       }
 
       if (typeof result === 'string') {
-        response.status(200).type('text/plain').send(result);
+        response.status(200).type('text/plain').send(encodeURIComponent(result));
         return;
       }
 
@@ -374,7 +391,7 @@ export class AppController {
       );
     }
 
-    this.logger.debug(`Creating a JSON with a nesting depth of ${depth}`);
+    this.logger.debug(`Creating a JSON with a nesting depth of ${JSON.stringify(depth)}`);
 
     let tmpObj = {};
     let jsonObj: Record<string, string> = { '0': 'Leaf' };

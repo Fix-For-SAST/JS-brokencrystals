@@ -1,6 +1,7 @@
 import type { ChangeEvent, FC, MouseEvent } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Isotope from 'isotope-layout';
+import DOMPurify from 'dompurify';
 import type { Product } from '../../interfaces/Product';
 import { readFileGrpc } from '../../api/GrpcClient';
 import {
@@ -123,9 +124,9 @@ export const Marketplace: FC<Props> = (props: Props) => {
       videoSrc ||
       'https://www.youtube-nocookie.com/embed/MPYlxeG-8_w?controls=0';
     if (videoElement) {
-      videoElement.outerHTML = `<iframe width="560" height="315" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ${
-        videoSrc && 'src="' + videoSrc
-      }"></iframe>`;
+      const sanitizedVideoSrc = DOMPurify.sanitize(videoSrc);
+      const srcAttr = sanitizedVideoSrc ? 'src="' + sanitizedVideoSrc + '"' : '';
+      videoElement.outerHTML = '<iframe width="560" height="315" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' + srcAttr + '></iframe>';
     }
   }, []);
 

@@ -33,9 +33,10 @@ export const Partners: FC = () => {
       for (const nameTag of Array.from(partnerNameTags)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const name = (nameTag as any)?.textContent || 'Error in loading name';
-        const photoUrl = `assets/img/partners/${name
+        const sanitizedName = encodeURIComponent(name
           .toLowerCase()
-          .replace(' ', '-')}.jpg`;
+          .replace(' ', '-'));
+        const photoUrl = `assets/img/partners/${sanitizedName}.jpg`;
         partnersList.push({ name: name, photoUrl: photoUrl });
       }
 

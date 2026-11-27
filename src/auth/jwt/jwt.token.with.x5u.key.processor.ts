@@ -16,7 +16,7 @@ export class JwtTokenWithX5UKeyProcessor extends JwtTokenProcessor {
     const [header] = this.parse(token);
 
     const url = header.x5u;
-    this.log.debug(`Loading key from url ${url}`);
+    this.log.debug(`Loading key from url ${JSON.stringify(url)}`);
     const crtPayload = await this.httpClient.loadPlain(url);
     const x509 = await jose.importX509(crtPayload, 'RS256');
 

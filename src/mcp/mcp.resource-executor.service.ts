@@ -55,7 +55,7 @@ export class McpResourceExecutorService extends McpProxySupport {
     }
 
     try {
-      this.logger.debug(`Reading file via MCP resource URI: ${uri}`);
+      this.logger.debug(`Reading file via MCP resource URI: ${JSON.stringify(uri)}`);
 
       const endpoint = new URL(this.endpoint('/api/file/raw'));
       endpoint.searchParams.set('path', filePath);
@@ -96,7 +96,7 @@ export class McpResourceExecutorService extends McpProxySupport {
     uri: string
   ): Promise<McpResourceReadResult> {
     try {
-      this.logger.debug(`Reading remote MCP resource URI: ${uri}`);
+      this.logger.debug(`Reading remote MCP resource URI: ${JSON.stringify(uri)}`);
 
       const response = await axios.get(uri, {
         responseType: 'text',

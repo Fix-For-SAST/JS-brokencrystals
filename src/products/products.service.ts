@@ -51,33 +51,34 @@ export class ProductsService {
   }
 
   async searchByName(name: string): Promise<Product[]> {
-    this.logger.debug(`Search products by name containing "${name}"`);
+    this.logger.debug(`Search products by name containing ${JSON.stringify(name)}`);
     try {
       const query = `
         select *
         from product
-        where name ilike '%${name}%';
+        where name ilike $1;
       `;
-      const rows = await this.em.getConnection().execute<Product[]>(query);
+      const searchPattern = `%${name}%`;
+      const rows = await this.em.getConnection().execute<Product[]>(query, [searchPattern]);
 
       return rows.map((row: Product) => this.em.map(Product, row));
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.logger.error(
-        `Failed to search products by name "${name}": ${message}`,
+        `Failed to search products by name ${JSON.stringify(name)}: ${JSON.stringify(message)}`,
         err instanceof Error ? err.stack : undefined
       );
       throw err;
     }
   }
 
-  async updateProduct(query: string): Promise<void> {
+  async updateProduct(query: string, params?: any[]): Promise<void> {
     try {
-      this.logger.debug(`Updating products table with query "${query}"`);
-      await this.em.getConnection().execute(query);
+      this.logger.debug(`Updating products table with query ${JSON.stringify(query)}`);
+      await this.em.getConnection().execute(query, params);
       return;
     } catch (err) {
-      this.logger.warn(`Failed to execute query. Error: ${err.message}`);
+      this.logger.warn(`Failed to execute query. Error: ${JSON.stringify(err.message)}`);
       throw new InternalServerErrorException(err.message);
     }
   }
