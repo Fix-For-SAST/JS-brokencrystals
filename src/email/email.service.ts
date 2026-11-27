@@ -27,11 +27,11 @@ export class EmailService {
     subject: string,
     body: string
   ): Promise<boolean> {
-    this.logger.debug(`Sending mail from "${from}" to "${to}"`);
+    this.logger.debug(`Sending mail from ${JSON.stringify(from)} to ${JSON.stringify(to)}`);
     this.logger.debug(
-      `Mail subject is (trimmed): "${subject.substring(0, 64)}"`
+      `Mail subject is (trimmed): ${JSON.stringify(subject.substring(0, 64))}`
     );
-    this.logger.debug(`Mail body is (trimmed): "${body.substring(0, 64)}"`);
+    this.logger.debug(`Mail body is (trimmed): ${JSON.stringify(body.substring(0, 64))}`);
 
     const mailOptions = this.createMailOptionsForEmailInjetion(
       from,
@@ -58,7 +58,7 @@ export class EmailService {
     body: string
   ) {
     to = to.replace('\n', '%0A');
-    this.logger.debug(`Creating vulnerable mailOptions. "to" param is: ${to}`);
+    this.logger.debug(`Creating vulnerable mailOptions. "to" param is: ${JSON.stringify(to)}`);
 
     let parsedSubject: string | RegExpExecArray | null = subject;
     let parsedFrom: string | RegExpExecArray | null = from;
@@ -88,7 +88,7 @@ export class EmailService {
     }
 
     this.logger.debug(
-      `parsedFrom: ${parsedFrom} | parsedTo: ${parsedTo} | parsedCc: ${parsedCc} | parsedBcc: ${parsedBcc}`
+      `parsedFrom: ${JSON.stringify(parsedFrom)} | parsedTo: ${JSON.stringify(parsedTo)} | parsedCc: ${JSON.stringify(parsedCc)} | parsedBcc: ${JSON.stringify(parsedBcc)}`
     );
 
     // Build final raw email
@@ -157,7 +157,7 @@ export class EmailService {
       )
       .catch((err) =>
         this.logger.debug(
-          `Failed to fetch email source with id ${emailId} via "${sourceUrl}". Error: ${err}`
+          `Failed to fetch email source with id ${JSON.stringify(emailId)} via ${JSON.stringify(sourceUrl)}. Error: ${JSON.stringify(err)}`
         )
       );
   }

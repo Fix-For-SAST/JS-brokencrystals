@@ -25,7 +25,7 @@ export class TestimonialsService {
     title: string
   ): Promise<Testimonial> {
     this.logger.debug(
-      `Create a testimonial. Name: ${message}, title: ${title}, message: ${message}`
+      `Create a testimonial. Name: ${JSON.stringify(message)}, title: ${JSON.stringify(title)}, message: ${JSON.stringify(message)}`
     );
 
     const connection = this.em.getConnection();
@@ -58,9 +58,11 @@ export class TestimonialsService {
     try {
       this.logger.debug(`Saved new testimonial`);
 
-      return (await this.em.getConnection().execute(query))[0].count as number;
+      // Use MikroORM's query builder to prevent SQL injection
+      const result = await this.testimonialsRepository.count();
+      return result;
     } catch (err) {
-      this.logger.warn(`Failed to execute query. Error: ${err.message}`);
+      this.logger.warn(`Failed to execute query. Error: ${JSON.stringify(err.message)}`);
       return err.message;
     }
   }

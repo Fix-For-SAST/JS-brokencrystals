@@ -770,7 +770,9 @@ export class McpController {
     if (res.raw.writableEnded) {
       return;
     }
-    res.raw.write(`event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`);
+    // Sanitize event name to prevent XSS by encoding special characters
+    const safeEvent = encodeURIComponent(event);
+    res.raw.write(`event: ${safeEvent}\ndata: ${JSON.stringify(payload)}\n\n`);
   }
 
   private isToolAllowedForSession(

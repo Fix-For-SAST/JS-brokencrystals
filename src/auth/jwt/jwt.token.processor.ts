@@ -18,11 +18,11 @@ export abstract class JwtTokenProcessor {
       throw new Error('Failed to parse jwt token header');
     }
     const headerStr = Buffer.from(parts[0], 'base64').toString('ascii');
-    this.log.debug(`Jwt token header is ${headerStr}`);
+    this.log.debug(`Jwt token header is ${JSON.stringify(headerStr)}`);
     const header: JwtHeader = JSON.parse(headerStr);
 
     const payloadStr = Buffer.from(parts[1], 'base64').toString('ascii');
-    this.log.debug(`Jwt token (None alg) payload is ${payloadStr}`);
+    this.log.debug(`Jwt token (None alg) payload is ${JSON.stringify(payloadStr)}`);
     const payload = JSON.parse(payloadStr);
 
     return [header, payload];

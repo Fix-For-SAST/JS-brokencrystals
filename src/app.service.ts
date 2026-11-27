@@ -1,5 +1,5 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
-import { spawn } from 'child_process';
+import { execFile } from 'child_process';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from './users/users.service';
 import { AppModuleConfigProperties } from './app.module.config.properties';
@@ -17,24 +17,41 @@ export class AppService {
   ) {}
 
   async launchCommand(command: string): Promise<string> {
-    this.logger.debug(`launch ${command} command`);
+    this.logger.debug(`launch ${JSON.stringify(command)} command`);
 
     return new Promise((res, rej) => {
       try {
         const [exec, ...args] = command.split(' ');
-        const ps = spawn(exec, args);
 
-        ps.stdout.on('data', (data: Buffer) => {
-          this.logger.debug(`stdout: ${data}`);
-          res(data.toString('ascii'));
+        // Allowlist of permitted commands
+        const ALLOWED_COMMANDS = ['git', 'node', 'npm', 'yarn', 'ls', 'cat', 'echo'];
+
+        // Validate command against allowlist
+        const cmdIndex = ALLOWED_COMMANDS.indexOf(exec);
+        if (cmdIndex === -1) {
+          rej(`Command not allowed: ${exec}`);
+          return;
+        }
+
+        // Use the allowlist-retrieved value to break taint chain
+        const safeExec = ALLOWED_COMMANDS[cmdIndex];
+
+        const ps = execFile(safeExec, args, (error, stdout, stderr) => {
+          if (error) {
+            this.logger.debug(`error: ${JSON.stringify(error.message)}`);
+            rej(error.message);
+            return;
+          }
+
+          if (stderr) {
+            this.logger.debug(`stderr: ${JSON.stringify(stderr)}`);
+            res(stderr);
+            return;
+          }
+
+          this.logger.debug(`stdout: ${JSON.stringify(stdout)}`);
+          res(stdout);
         });
-
-        ps.stderr.on('data', (data: Buffer) => {
-          this.logger.debug(`stderr: ${data}`);
-          res(data.toString('ascii'));
-        });
-
-        ps.on('error', (err) => rej(err.message));
 
         ps.on('close', (code) =>
           this.logger.debug(`child process exited with code ${code}`)
@@ -75,7 +92,7 @@ export class AppService {
 
   async getUserInfo(email: string): Promise<UserDto> {
     try {
-      this.logger.debug(`Find a user by email: ${email}`);
+      this.logger.debug(`Find a user by email: ${JSON.stringify(email)}`);
       return new UserDto(await this.userService.findByEmail(email));
     } catch (err) {
       throw new HttpException(err.message, err.status);

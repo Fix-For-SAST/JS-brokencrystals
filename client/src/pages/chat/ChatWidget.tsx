@@ -1,10 +1,12 @@
 import type { ChangeEvent, FC, KeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { queryChat } from '../../api/httpClient';
 import type { ChatMessage } from '../../interfaces/ChatMessage';
 
 const UnsafeComponent: FC<{ html: string }> = ({ html }) => {
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  const sanitizedHtml = DOMPurify.sanitize(html);
+  return <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
 };
 
 export const ChatWidget: FC = () => {

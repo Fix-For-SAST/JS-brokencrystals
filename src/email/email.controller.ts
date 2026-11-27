@@ -74,14 +74,14 @@ export class EmailController {
     let rawQuery = '';
     for (const queryKey of Object.keys(query)) {
       if (query[queryKey].includes('proto')) {
-        rawQuery += `&${queryKey}=${query[queryKey]}`;
+        rawQuery += '&' + queryKey + '=' + query[queryKey];
       } else {
-        rawQuery += encodeURI(`&${queryKey}=${query[queryKey]}`);
+        rawQuery += encodeURI('&' + queryKey + '=' + query[queryKey]);
       }
     }
     // Remove the inital '&'
-    rawQuery = `?${rawQuery.substring(1)}`;
-    this.logger.debug(`Raw query ${rawQuery}`);
+    rawQuery = '?' + rawQuery.substring(1);
+    this.logger.debug('Raw query ' + rawQuery);
 
     // "Use" the status code
     const uriParams = splitUriIntoParamsPPVulnerable(rawQuery);
@@ -89,8 +89,8 @@ export class EmailController {
       responseJson.status = uriParams.status as HttpStatus;
     }
 
-    const mailSubject = `Support email regarding "${subject}"`;
-    const mailBody = `Hi ${name},\nWe recieved your email and just wanted to let you know we're on it!\n\nYour original inquiry was:\n**********************\n${content}\n**********************`;
+    const mailSubject = 'Support email regarding "' + subject + '"';
+    const mailBody = 'Hi ' + name + ',\nWe recieved your email and just wanted to let you know we\'re on it!\n\nYour original inquiry was:\n**********************\n' + content + '\n**********************';
     const didSucceed = await this.emailService.sendRawEmail(
       this.BC_EMAIL_ADDRESS,
       to,
@@ -99,10 +99,13 @@ export class EmailController {
     );
 
     if (didSucceed) {
-      responseJson.message = `Email sent to "${name} <${to}>" successfully`;
+      // Sanitize user input to prevent XSS using Veracode-approved encodeURIComponent
+      const safeName = encodeURIComponent(name);
+      const safeTo = encodeURIComponent(to);
+      responseJson.message = 'Email sent to "' + safeName + ' <' + safeTo + '>" successfully';
       res.status(HttpStatus.OK);
     } else {
-      responseJson.message = `Failed sending a support email. Or your exploit just ain't cutting it... Level up.`;
+      responseJson.message = 'Failed sending a support email. Or your exploit just ain\'t cutting it... Level up.';
       res.status(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

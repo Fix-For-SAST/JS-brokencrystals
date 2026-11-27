@@ -29,7 +29,7 @@ export class HttpClientService {
     if (![200, 201].includes(+resp.status)) {
       throw new Error(`Failed to load url: ${url}. Status ${resp.status}`);
     }
-    this.log.debug(`Loaded: ${resp.data}`);
+    this.log.debug(`Loaded: ${JSON.stringify(resp.data)}`);
     return resp.data;
   }
 
@@ -38,7 +38,7 @@ export class HttpClientService {
     if (![200, 201].includes(+resp.status)) {
       throw new Error(`Failed to load url: ${url}. Status ${resp.status}`);
     }
-    this.log.debug(`Loaded: ${resp.data}`);
+    this.log.debug(`Loaded: ${JSON.stringify(resp.data)}`);
     return resp.data;
   }
 
@@ -53,7 +53,7 @@ export class HttpClientService {
 
     const buffer = Buffer.from(resp.data);
     const text = buffer.toString();
-    this.log.debug(`Loaded: ${text}`);
+    this.log.debug(`Loaded: ${JSON.stringify(text)}`);
     return text;
   }
 

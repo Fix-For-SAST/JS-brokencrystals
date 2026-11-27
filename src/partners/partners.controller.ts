@@ -43,7 +43,7 @@ export class PartnersController {
     type: String
   })
   async queryPartnersRaw(@Query('xpath') xpath: string): Promise<string> {
-    this.logger.debug(`Getting partners with xpath expression "${xpath}"`);
+    this.logger.debug(`Getting partners with xpath expression ${JSON.stringify(xpath)}`);
 
     try {
       return this.partnersService.getPartnersProperties(xpath);
@@ -81,7 +81,7 @@ export class PartnersController {
     @Query('password') password: string
   ): Promise<string> {
     this.logger.debug(
-      `Trying to login partner with username ${username} using password ${password}`
+      `Trying to login partner with username ${JSON.stringify(username)} using password ${JSON.stringify(password)}`
     );
 
     try {
@@ -125,7 +125,7 @@ export class PartnersController {
     type: String
   })
   async searchPartners(@Query('keyword') keyword: string): Promise<string> {
-    this.logger.debug(`Searching partner names by the keyword "${keyword}"`);
+    this.logger.debug(`Searching partner names by the keyword ${JSON.stringify(keyword)}`);
 
     try {
       const xpath = `//partners/partner/name[contains(., '${keyword}')]`;

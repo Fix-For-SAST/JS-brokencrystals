@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Buffer } from 'buffer';
 import { fileTypeFromBuffer } from 'file-type/core';
+import DOMPurify from 'dompurify';
 import { getUserPhoto, putPhoto } from '../../../api/httpClient';
 import { RoutePath } from '../../../router/RoutePath';
 
@@ -54,7 +55,7 @@ export const Sign: FC = () => {
         <>
           <label htmlFor="file-input" className="file-input-label">
             <img
-              src={userImage || 'assets/img/profile.png'}
+              src={DOMPurify.sanitize(userImage || 'assets/img/profile.png')}
               alt=""
               className="profile-image"
             />
