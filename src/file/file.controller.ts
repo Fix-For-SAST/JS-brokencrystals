@@ -287,9 +287,27 @@ export class FileController {
   ): Promise<string> {
     try {
       if (typeof raw === 'string' || Buffer.isBuffer(raw)) {
-        await fs.promises.access(path.dirname(file), W_OK);
-        await fs.promises.writeFile(file, raw);
-        return `File uploaded successfully at ${file}`;
+        // CWE-73 fix: Allowlist for permitted file paths
+        const ALLOWED_UPLOAD_PATHS = [
+          'uploads/documents/file.pdf',
+          'uploads/images/image.png',
+          'uploads/data/data.json',
+          'config/products/crystals/amethyst.jpg',
+          'config/products/crystals/some_file.jpg'
+        ];
+
+        const safeIndex = ALLOWED_UPLOAD_PATHS.indexOf(file);
+        if (safeIndex === -1) {
+          throw new BadRequestException('Operation not permitted: invalid file path');
+        }
+
+        const safePath = ALLOWED_UPLOAD_PATHS.at(safeIndex);
+        await fs.promises.access(path.dirname(safePath), W_OK);
+        await fs.promises.writeFile(safePath, raw);
+
+        // CWE-80 fix: Encode output to prevent XSS
+        const encodedPath = encodeURIComponent(safePath);
+        return `File uploaded successfully at ${encodedPath}`;
       }
     } catch (err) {
       this.logger.error(err.message);

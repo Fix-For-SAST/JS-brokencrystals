@@ -111,7 +111,7 @@ export class UsersController {
   })
   async getByEmail(@Param('email') email: string): Promise<UserDto> {
     try {
-      this.logger.debug(`Find a user by email: ${email}`);
+      this.logger.debug(`Find a user by email: ${JSON.stringify(email)}`);
       return new UserDto(await this.usersService.findByEmail(email));
     } catch (err) {
       throw new HttpException(err.message, err.status);
@@ -169,7 +169,7 @@ export class UsersController {
   })
   async getFullUserInfo(@Param('email') email: string): Promise<UserDto> {
     try {
-      this.logger.debug(`Find a full user info by email: ${email}`);
+      this.logger.debug(`Find a full user info by email: ${JSON.stringify(email)}`);
       return new UserDto(await this.usersService.findByEmail(email));
     } catch (err) {
       throw new HttpException(err.message, err.status);
@@ -188,7 +188,7 @@ export class UsersController {
   })
   async searchByName(@Param('name') name: string): Promise<UserDto[]> {
     try {
-      this.logger.debug(`Search users by name: ${name}`);
+      this.logger.debug(`Search users by name: ${JSON.stringify(name)}`);
       const users = await this.usersService.searchByName(name, 50);
       return users.map((user) => new UserDto(user));
     } catch (err) {
@@ -216,7 +216,7 @@ export class UsersController {
     @Param('email') email: string,
     @Res({ passthrough: true }) res: FastifyReply
   ) {
-    this.logger.debug(`Find a user photo by email: ${email}`);
+    this.logger.debug(`Find a user photo by email: ${JSON.stringify(email)}`);
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new NotFoundException({
@@ -293,7 +293,7 @@ export class UsersController {
     isArray: true
   })
   async ldapQuery(@Query('query') query: string): Promise<UserDto[]> {
-    this.logger.debug(`Call ldapQuery: ${query}`);
+    this.logger.debug(`Call ldapQuery: ${JSON.stringify(query)}`);
     let users: User[];
 
     try {
@@ -342,7 +342,7 @@ export class UsersController {
   })
   async createUser(@Body() user: CreateUserRequest): Promise<UserDto> {
     try {
-      this.logger.debug(`Create a basic user: ${user}`);
+      this.logger.debug(`Create a basic user: ${JSON.stringify(user)}`);
 
       const userExists = await this.doesUserExist(user);
       if (userExists) {
@@ -378,7 +378,7 @@ export class UsersController {
   })
   async createOIDCUser(@Body() user: CreateUserRequest): Promise<UserDto> {
     try {
-      this.logger.debug(`Create a OIDC user: ${user}`);
+      this.logger.debug(`Create a OIDC user: ${JSON.stringify(user)}`);
 
       const userExists = await this.doesUserExist(user);
 

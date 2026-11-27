@@ -78,7 +78,7 @@ export class McpService {
   ): Promise<McpResourceReadResult> {
     const { uri } = params;
 
-    this.logger.debug(`Reading resource URI: ${uri}`);
+    this.logger.debug(`Reading resource URI: ${JSON.stringify(uri)}`);
 
     return this.resourceExecutor.readResource(uri, context.authorizationHeader);
   }

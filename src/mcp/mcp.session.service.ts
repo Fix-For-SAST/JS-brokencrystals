@@ -134,7 +134,7 @@ export class McpSessionService {
       const removed = this.sessions.delete(sessionId);
       if (removed) {
         this.log.debug(
-          `MCP session ${sessionId} invalidated ${delayMs}ms after DELETE request`
+          `MCP session ${JSON.stringify(sessionId)} invalidated ${delayMs}ms after DELETE request`
         );
       }
     }, delayMs);

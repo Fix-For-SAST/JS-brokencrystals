@@ -25,7 +25,7 @@ export class SubscriptionsController {
     description: 'Returns subscribed email'
   })
   async subscribe(@Query('email') email: string): Promise<string> {
-    this.logger.log(`Subscribed with email ${email}`);
-    return email;
+    this.logger.log(`Subscribed with email ${JSON.stringify(email)}`);
+    return encodeURIComponent(email);
   }
 }

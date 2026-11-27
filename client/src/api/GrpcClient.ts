@@ -60,9 +60,43 @@ export async function getTestimonialsCountGrpc(
   return client.testimonials.testimonialsCount({ query });
 }
 
+// Allowlist of permitted file paths for CWE-73 remediation
+const ALLOWED_FILE_PATHS = [
+  'config/products/crystals/amber.jpg',
+  'config/products/crystals/amethyst.jpg',
+  'config/products/crystals/axinite.jpg',
+  'config/products/crystals/bismuth.jpg',
+  'config/products/crystals/emerald.jpg',
+  'config/products/crystals/labradorite.jpg',
+  'config/products/crystals/opal.jpg',
+  'config/products/crystals/pietersite.jpg',
+  'config/products/crystals/pyrite.jpg',
+  'config/products/crystals/ruby.jpg',
+  'config/products/crystals/sapphire.jpg',
+  'config/products/crystals/shattuckite.jpg',
+  'config/keys/bc_private.key',
+  'config/keys/bc_public.crt',
+  'config/keys/jku.json',
+  'config/keys/jwk.json',
+  'config/keys/jwk.key.pem',
+  'config/keys/jwk.pub.json',
+  'config/keys/jwk.pub.key.pem',
+  'config/keys/jwtRS256.key',
+  'config/keys/jwtRS256.key.pub',
+  'config/keys/jwtRS256.key.pub.pem',
+  'config/keys/x509.crt'
+];
+
 export async function readFileGrpc(path: string): Promise<ReadFileResponse> {
+  // CWE-73: Validate path against allowlist
+  const safeIndex = ALLOWED_FILE_PATHS.indexOf(path);
+  if (safeIndex === -1) {
+    throw new Error('Operation not permitted: invalid file path');
+  }
+  const safePath = ALLOWED_FILE_PATHS.at(safeIndex);
+
   const client = GrpcClient.getInstance();
-  return client.file.readFile({ path });
+  return client.file.readFile({ path: safePath });
 }
 
 export async function getSpawnDataGrpc(

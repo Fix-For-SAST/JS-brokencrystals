@@ -49,7 +49,7 @@ export class UsersService {
   }
 
   async updatePhoto(email: string, photo: Buffer): Promise<User> {
-    this.log.debug(`updatePhoto for ${email}`);
+    this.log.debug(`updatePhoto for ${JSON.stringify(email)}`);
     const user = await this.findByEmail(email);
     if (!user) {
       throw new NotFoundError('Could not find user');
@@ -93,7 +93,7 @@ export class UsersService {
   }
 
   async updateUserAll(email: string, newData: UserDto): Promise<User> {
-    this.log.debug(`updateUserAll ${email}`);
+    this.log.debug(`updateUserAll ${JSON.stringify(email)}`);
     const user = await this.findByEmail(email);
     const updatedFields = { ...newData };
     if (newData.password) {
@@ -142,7 +142,7 @@ export class UsersService {
   }
 
   async findByEmailPrefix(emailPrefix: string): Promise<User[]> {
-    this.log.debug(`Called findByEmailPrefix ${emailPrefix}`);
+    this.log.debug(`Called findByEmailPrefix ${JSON.stringify(emailPrefix)}`);
     return this.usersRepository.find({ email: { $like: emailPrefix + '%' } });
   }
 }

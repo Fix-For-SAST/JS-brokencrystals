@@ -14,7 +14,7 @@ export class LdapQueryHandler {
   private log: Logger = new Logger(LdapQueryHandler.name);
 
   public parseQuery(query: string): string {
-    this.log.debug(`query: ${query}`);
+    this.log.debug(`query: ${JSON.stringify(query)}`);
 
     const res = query.match(LdapQueryHandler.PARSER);
 

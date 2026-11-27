@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
-import { spawn } from 'child_process';
+import { execFile } from 'child_process';
 import * as dotT from 'dot';
 import {
   ConfigToolInput,
@@ -37,6 +37,14 @@ export class McpToolExecutorService extends McpProxySupport {
     'username',
     'phone',
     'role'
+  ] as const;
+  private static readonly ALLOWED_COMMANDS = [
+    'echo',
+    'ls',
+    'pwd',
+    'date',
+    'whoami',
+    'uname'
   ] as const;
 
   async executeTool(
@@ -268,34 +276,54 @@ export class McpToolExecutorService extends McpProxySupport {
         };
       }
 
+      // Validate command against allowlist
+      const commandIndex = McpToolExecutorService.ALLOWED_COMMANDS.indexOf(
+        exec as typeof McpToolExecutorService.ALLOWED_COMMANDS[number]
+      );
+      if (commandIndex === -1) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Error: Command '${exec}' is not allowed. Permitted commands: ${McpToolExecutorService.ALLOWED_COMMANDS.join(', ')}`
+            }
+          ],
+          isError: true
+        };
+      }
+
+      // Retrieve safe command from allowlist
+      const safeCommand = McpToolExecutorService.ALLOWED_COMMANDS[commandIndex];
+
       const text = await new Promise<string>((resolve, reject) => {
-        const process = spawn(exec, args);
         let stdout = '';
         let stderr = '';
 
-        process.stdout.on('data', (data: Buffer) => {
-          const text = data.toString('utf-8');
-          stdout += text;
-          context.onPartialOutput?.({ source: 'stdout', text });
-        });
+        const process = execFile(safeCommand, args, (error, stdoutResult, stderrResult) => {
+          if (error) {
+            reject(error);
+            return;
+          }
 
-        process.stderr.on('data', (data: Buffer) => {
-          const text = data.toString('utf-8');
-          stderr += text;
-          context.onPartialOutput?.({ source: 'stderr', text });
-        });
-
-        process.on('error', (error) => reject(error));
-        process.on('close', (code) => {
-          const output = (stdout || stderr).trim();
+          const output = (stdoutResult || stderrResult).trim();
           if (output.length) {
             resolve(output);
             return;
           }
 
-          resolve(
-            code === 0 ? '(no output)' : `process exited with code ${code}`
-          );
+          resolve('(no output)');
+        });
+
+        process.stdout?.on('data', (data: Buffer) => {
+          const text = data.toString('utf-8');
+          stdout += text;
+          context.onPartialOutput?.({ source: 'stdout', text });
+        });
+
+        process.stderr?.on('data', (data: Buffer) => {
+          const text = data.toString('utf-8');
+          stderr += text;
+          context.onPartialOutput?.({ source: 'stderr', text });
         });
       });
 

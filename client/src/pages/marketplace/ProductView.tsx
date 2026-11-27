@@ -27,7 +27,7 @@ export const ProductView: FC<Props> = (props: Props) => {
     >
       <div className="portfolio-wrap">
         <img
-          src={props.product.photoUrl}
+          src={encodeURI(props.product.photoUrl)}
           className="img-fluid"
           alt={`Image of ${props.product.name}`}
           onLoad={() => {
@@ -35,7 +35,7 @@ export const ProductView: FC<Props> = (props: Props) => {
             viewProduct(props.product.name);
           }}
           onClick={() => {
-            console.log('Product clicked:', props.product.name);
+            console.log('Product clicked:', JSON.stringify(props.product.name));
             viewProductGrpc(props.product.name);
           }}
           style={{ cursor: 'pointer' }}
@@ -47,7 +47,7 @@ export const ProductView: FC<Props> = (props: Props) => {
         </div>
         <div className="portfolio-links">
           <a
-            href={props.product.photoUrl}
+            href={encodeURI(props.product.photoUrl)}
             data-gall="portfolioGallery"
             className="venobox"
             title={props.product.name}
