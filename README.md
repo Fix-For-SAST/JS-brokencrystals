@@ -2,7 +2,7 @@
 
 Broken Crystals is a benchmark application that uses modern technologies and implements a set of common security vulnerabilities.
 
-The application contains:
+The application contains:.
 
 - React based web client & API: http://localhost:3000
 - Node.js server that serves the React client and provides both OpenAPI and GraphQL endpoints.
